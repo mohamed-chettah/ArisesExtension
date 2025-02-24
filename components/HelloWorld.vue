@@ -20,10 +20,10 @@ async function register() {
       password: password.value
     });
 
-    console.log("Response:", response.data);
-    storage.setItem("token", response.data.token);
+    // console.log("Response:", response.data);
+    // storage.setItem("token", response.data.token);
   } catch (error) {
-    console.error("Error:", error.response ? error.response.data : error.message);
+    // console.error("Error:", error.response ? error.response.data : error.message);
   }
 }
 
