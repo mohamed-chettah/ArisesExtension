@@ -3,10 +3,6 @@ import { ref } from 'vue';
 import axios from 'axios';
 import { storage, StorageItemKey } from "wxt/storage";
 
-defineProps({
-  msg: String,
-});
-
 
 const email = ref('');
 const password = ref('');
@@ -31,19 +27,14 @@ const count = ref(0);
 </script>
 
 <template>
-  <h1>{{ msg }}</h1>
+  <p>dsefrsdffsdfs</p>
   <form @submit.prevent="register">
     <input type="email" v-model="email" />
     <input type="password" v-model="password" />
     <button type="submit">Register</button>
   </form>
-
-  <p>
-    Install
-    <a href="https://github.com/vuejs/language-tools" target="_blank">Volar</a>
-    in your IDE for a better DX
-  </p>
-  <p class="read-the-docs">Click on the WXT and Vue logos to learn more</p>
+  <router-link class="bg-white rounded-md p-2" to="/">🏠 Accueil</router-link>
+      <router-link class="bg-white rounded-md p-2" to="/settings">⚙️ Paramètres</router-link>
 </template>
 
 <style scoped>
