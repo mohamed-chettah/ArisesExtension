@@ -39,6 +39,8 @@ async function register() {
 
     <Button>Click me</Button>
 
+    <router-link class="bg-white rounded-md p-2" to="/">🏠 Accueil</router-link>
+    <router-link class="bg-white rounded-md p-2" to="/settings">⚙️ Paramètres</router-link>
     
 </div>
   <!-- <p>dsefrsdffsdfs</p>

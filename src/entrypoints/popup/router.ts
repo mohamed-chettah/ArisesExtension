@@ -1,14 +1,15 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import Home from '@/components/Home.vue';
-import Settings from '@/components/HelloWorld.vue';
+import Login from '@/components/Login.vue';
 
 
 const router = createRouter({
   history: createWebHashHistory(), // Utilisation du hash mode
   routes: [
-    { path: '/', component: Settings },
+    { path: '/', component: Login },
     { path: '/settings', component: Home },
   ],
 });
+
 
 export default router;
