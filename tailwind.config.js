@@ -54,7 +54,10 @@ module.exports = {
   				'3': 'hsl(var(--chart-3))',
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
-  			}
+  			},
+  			'primary': '#445EF2',  // Couleur bleue
+			'secondary': '#A480F2', // Couleur violette
+			'black': '#000000' // Couleur orange
   		}
   	}
   },

@@ -29,28 +29,15 @@ async function register() {
 
 <div class="flex flex-col items-center justify-center">
 
-    <img class="" src="@/assets/arises.svg" alt="Arises logo" />
-
+    
     <p class="text-center text-[#D9D9D9]">
         Rise Above. Go Beyond 
     </p>
 
     <p class="text-center text-white">Connect With</p>
 
-    <Button>Click me</Button>
-
-    <router-link class="bg-white rounded-md p-2" to="/">🏠 Accueil</router-link>
-    <router-link class="bg-white rounded-md p-2" to="/settings">⚙️ Paramètres</router-link>
-    
+    <Button class="bg-primary text-white">Click me</Button>
 </div>
-  <!-- <p>dsefrsdffsdfs</p>
-  <form @submit.prevent="register">
-    <input type="email" v-model="email" />
-    <input type="password" v-model="password" />
-    <button type="submit">Register</button>
-  </form>
-  <router-link class="bg-white rounded-md p-2" to="/">🏠 Accueil</router-link>
-      <router-link class="bg-white rounded-md p-2" to="/settings">⚙️ Paramètres</router-link> -->
 </template>
 
 <style scoped>

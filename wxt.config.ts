@@ -6,6 +6,7 @@ export default defineConfig({
   extensionApi: 'chrome',
   modules: ['@wxt-dev/module-vue','@wxt-dev/auto-icons'],
   manifest: {
+    name: 'Arises Extension',
     permissions: ['storage']
   },
   outDir: 'dist',
@@ -18,6 +19,6 @@ export default defineConfig({
     },
     css: {
       postcss: './postcss.config.cjs'
-    }
+    },
   })
 });

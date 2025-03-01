@@ -17,6 +17,7 @@
   "dependencies": {
     "@tailwindcss/postcss": "^4.0.7",
     "@vueuse/core": "^12.7.0",
+    "@wxt-dev/storage": "^1.1.0",
     "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
