@@ -27,7 +27,8 @@ async function handleSubmit(e) {
       password: password.value
     })
     // Gérer la réponse (token, redirection, etc.)
-    // storage.setItem("token", response.data.token)
+    await storage.getItem('local:installDate', response.data.token)
+    router.push('/dashboard')
   } catch (error) {
     if (error.response?.data?.errors) {
       errors.value = error.response.data.errors
@@ -82,7 +83,7 @@ async function handleXLogin(e) {
       </div>
       <CardContent class="grid p-0 md:grid-cols-2">
         <form @submit="handleSubmit" class="p-6 md:p-8">
-          <div class="flex flex-col gap-6">
+          <div class="flex flex-col gap-5">
             <!-- Message d'erreur général -->
             <div v-if="errors.general" class="text-red-500 text-sm">
               <p v-for="error in errors.general" :key="error">{{ error }}</p>
@@ -130,6 +131,13 @@ async function handleXLogin(e) {
               <span v-if="isLoading"></span>
               {{ isLoading ? 'Loading...' : 'Continue' }}
             </Button>
+
+            <a
+                  href="#"
+                  class=" text-white ml-auto text-sm underline-offset-2 hover:underline"
+                >
+                Don't have an account?
+                </a>
 
             <div class="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
               <span class="relative z-10 bg-black px-2 text-white">

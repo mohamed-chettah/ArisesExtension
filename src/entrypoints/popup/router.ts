@@ -1,13 +1,12 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
-import Home from '@/components/Home.vue';
 import LoginForm from '@/components/LoginForm.vue';
-
+import Dashboard from '@/components/Dashboard.vue';
 
 const router = createRouter({
   history: createWebHashHistory(), // Utilisation du hash mode
   routes: [
     { path: '/', component: LoginForm },
-    { path: '/settings', component: Home },
+    { path: '/dashboard', component: Dashboard },
   ],
 });
 
