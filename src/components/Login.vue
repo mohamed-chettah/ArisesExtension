@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import { storage, StorageItemKey } from "wxt/storage";
-
+import { Button } from '@/components/ui/button'
 
 const email = ref('');
 const password = ref('');
@@ -37,7 +37,7 @@ async function register() {
 
     <p class="text-center text-white">Connect With</p>
 
-
+    <Button>Click me</Button>
 
     
 </div>
