@@ -3,9 +3,12 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import axios from 'axios'
 import { storage } from "wxt/storage"
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const email = ref('')
 const password = ref('')
@@ -15,6 +18,34 @@ const isXLoading = ref(false)
 const errors = ref({})
 const googleError = ref('')
 const xError = ref('')
+
+// Fonction pour effacer les erreurs après un délai
+function clearErrorsAfterDelay(delay = 5000) {
+  setTimeout(() => {
+    errors.value = {}
+    googleError.value = ''
+    xError.value = ''
+  }, delay)
+}
+
+// Surveiller les changements d'erreurs et les effacer après un délai
+watch(errors, (newErrors) => {
+  if (Object.keys(newErrors).length > 0) {
+    clearErrorsAfterDelay()
+  }
+})
+
+watch(googleError, (newError) => {
+  if (newError) {
+    clearErrorsAfterDelay()
+  }
+})
+
+watch(xError, (newError) => {
+  if (newError) {
+    clearErrorsAfterDelay()
+  }
+})
 
 async function handleSubmit(e) {
   e.preventDefault()
@@ -27,7 +58,7 @@ async function handleSubmit(e) {
       password: password.value
     })
     // Gérer la réponse (token, redirection, etc.)
-    await storage.getItem('local:installDate', response.data.token)
+    storeData(response.data)
     router.push('/dashboard')
   } catch (error) {
     if (error.response?.data?.errors) {
@@ -35,6 +66,7 @@ async function handleSubmit(e) {
     } else if (error.response?.data?.message) {
       errors.value = { general: [error.response.data.message] }
     } else {
+      console.log(error)
       errors.value = { general: ['An unexpected error occurred'] }
     }
   } finally {
@@ -49,7 +81,7 @@ async function handleGoogleLogin(e) {
   try {
     console.log("Sending Google login request...")
     const response = await axios.post('http://localhost:5005/api/login/google')
-    // Gérer la réponse
+    console.log(response.data)
   } catch (error) {
     googleError.value = error.response?.data?.message || 'Failed to login with Google'
   } finally {
@@ -63,13 +95,20 @@ async function handleXLogin(e) {
   xError.value = ''
   try {
     console.log("Sending X login request...")
-    const response = await axios.post('http://localhost:5005/api/login/x')
-    // Gérer la réponse
+    const response = await axios.get('http://localhost:5005/api/auth/twitter')
+    if (response.data.url) {
+      chrome.tabs.create({ url: response.data.url });
+    }
   } catch (error) {
     xError.value = error.response?.data?.message || 'Failed to login with X'
   } finally {
     isXLoading.value = false
   }
+}
+
+async function storeData(data) {
+  await storage.setItem('local:accessToken', data.access_token)
+  await storage.setItem('local:user', data.user)
 }
 </script>
 
@@ -98,6 +137,7 @@ async function handleXLogin(e) {
                 placeholder="m@example.com"
                 required
                 :class="{ 'border-red-500': errors.email }"
+                 class="border-secondary border-[1px]"
               />
               <div v-if="errors.email" class="text-red-500 text-sm">
                 <p v-for="error in errors.email" :key="error">{{ error }}</p>
@@ -109,7 +149,7 @@ async function handleXLogin(e) {
                 <Label for="password">Password</Label>
                 <a
                   href="#"
-                  class="ml-auto text-sm underline-offset-2 hover:underline"
+                  class="ml-auto text-xs underline-offset-2 hover:underline"
                 >
                   Forgot your password?
                 </a>
@@ -121,6 +161,7 @@ async function handleXLogin(e) {
                 placeholder="********"
                 required 
                 :class="{ 'border-red-500': errors.password }"
+                class="border-secondary border-[1px]"
               />
               <div v-if="errors.password" class="text-red-500 text-sm">
                 <p v-for="error in errors.password" :key="error">{{ error }}</p>
@@ -134,7 +175,7 @@ async function handleXLogin(e) {
 
             <a
                   href="#"
-                  class=" text-white ml-auto text-sm underline-offset-2 hover:underline"
+                  class="-mt-2 text-white text-xs ml-auto text-sm underline-offset-2 hover:underline"
                 >
                 Don't have an account?
                 </a>
@@ -151,11 +192,11 @@ async function handleXLogin(e) {
                   <Button 
                     type="submit" 
                     variant="outline" 
-                    class="!h-14 !w-14 !p-0 !rounded-full border-purple border-2 flex items-center justify-center" 
+                    style="height: 65px !important; width: 65px !important; padding: 0 !important; border-radius: 9999px !important;"
+                    class="border-secondary border-[1px] flex items-center justify-center" 
                     :disabled="isGoogleLoading"
                   >
-                    <span v-if="isGoogleLoading"></span>
-                    <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width: 24px !important; height: 24px !important;">
                       <path
                         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                         fill="#4285F4"
@@ -173,36 +214,34 @@ async function handleXLogin(e) {
                         fill="#EA4335"
                       />
                     </svg>
-                    <span class="sr-only">Login with Google</span>
                   </Button>
-                  <div v-if="googleError" class="text-red-500 text-sm text-center">
-                    {{ googleError }}
-                  </div>
                 </div>
               </form>
-
               <form @submit="handleXLogin">
                 <div class="flex flex-col gap-2">
                   <Button 
                     type="submit" 
                     variant="outline" 
-                    class="!h-14 !w-14 !p-0 !rounded-full border-purple border-2 flex items-center justify-center" 
+                    style="height: 65px !important; width: 65px !important; padding: 0 !important; border-radius: 9999px !important;"
+                    class="border-secondary border-[1px] flex items-center justify-center"
                     :disabled="isXLoading"
                   >
-                    <span v-if="isXLoading"></span>
-                    <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width: 24px !important; height: 24px !important;">
                       <path
                         d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
                         fill="currentColor"
                       />
                     </svg>
-                    <span class="sr-only">Login with X</span>
                   </Button>
-                  <div v-if="xError" class="text-red-500 text-sm text-center">
-                    {{ xError }}
-                  </div>
                 </div>
+              
               </form>
+            </div>
+            <div v-if="googleError" class="text-red-500 text-sm text-center">
+                    {{ googleError }}
+            </div>
+            <div v-if="xError" class="text-red-500 text-sm text-center">
+                  {{ xError }}
             </div>
           </div>
         </form>

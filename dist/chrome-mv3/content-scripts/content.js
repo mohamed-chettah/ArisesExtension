@@ -10,7 +10,6 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
   const definition = defineContentScript({
     matches: ["*://*.google.com/*"],
     main() {
-      console.log("Hello content.");
     }
   });
   content;

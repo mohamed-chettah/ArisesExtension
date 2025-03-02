@@ -98,6 +98,16 @@ var background = function() {
         `If using a wildcard (*), it must go at the start of the hostname`
       );
   }
+  const definition = defineBackground(() => {
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      if (message.type === "twitter_auth_success") {
+        chrome.storage.local.set({ twitter_token: message.token });
+        console.log("Token reçu et stocké !");
+      }
+    });
+  });
+  function initPlugins() {
+  }
   const browser = (
     // @ts-expect-error
     ((_b = (_a = globalThis.browser) == null ? void 0 : _a.runtime) == null ? void 0 : _b.id) == null ? globalThis.chrome : (
@@ -105,12 +115,6 @@ var background = function() {
       globalThis.browser
     )
   );
-  const definition = defineBackground(() => {
-    console.log("Hello background!", { id: browser.runtime.id });
-  });
-  background;
-  function initPlugins() {
-  }
   function print(method, ...args) {
     if (typeof args[0] === "string") {
       const message = args.shift();
