@@ -57,7 +57,6 @@ async function handleSubmit(e) {
       email: email.value,
       password: password.value
     })
-    // Gérer la réponse (token, redirection, etc.)
     storeData(response.data)
     router.push('/dashboard')
   } catch (error) {
@@ -80,8 +79,10 @@ async function handleGoogleLogin(e) {
   googleError.value = ''
   try {
     console.log("Sending Google login request...")
-    const response = await axios.post('http://localhost:5005/api/login/google')
-    console.log(response.data)
+    const response = await axios.get('http://localhost:5005/api/auth/google')
+    if (response.data.url) {
+      chrome.tabs.create({ url: response.data.url });
+    }
   } catch (error) {
     googleError.value = error.response?.data?.message || 'Failed to login with Google'
   } finally {
@@ -192,7 +193,7 @@ async function storeData(data) {
                   <Button 
                     type="submit" 
                     variant="outline" 
-                    style="height: 65px !important; width: 65px !important; padding: 0 !important; border-radius: 9999px !important;"
+                    style=""
                     class="border-secondary border-[1px] flex items-center justify-center" 
                     :disabled="isGoogleLoading"
                   >
@@ -214,28 +215,11 @@ async function storeData(data) {
                         fill="#EA4335"
                       />
                     </svg>
+                    Login with Google
                   </Button>
                 </div>
               </form>
-              <form @submit="handleXLogin">
-                <div class="flex flex-col gap-2">
-                  <Button 
-                    type="submit" 
-                    variant="outline" 
-                    style="height: 65px !important; width: 65px !important; padding: 0 !important; border-radius: 9999px !important;"
-                    class="border-secondary border-[1px] flex items-center justify-center"
-                    :disabled="isXLoading"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width: 24px !important; height: 24px !important;">
-                      <path
-                        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
-                        fill="currentColor"
-                      />
-                    </svg>
-                  </Button>
-                </div>
-              
-              </form>
+            
             </div>
             <div v-if="googleError" class="text-red-500 text-sm text-center">
                     {{ googleError }}
