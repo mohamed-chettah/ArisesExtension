@@ -1,13 +1,23 @@
 import { defineConfig } from 'wxt';
 import { resolve } from 'path';
 
-// See https://wxt.dev/api/config.html
 export default defineConfig({
   extensionApi: 'chrome',
-  modules: ['@wxt-dev/module-vue','@wxt-dev/auto-icons'],
+  modules: ['@wxt-dev/module-vue', '@wxt-dev/auto-icons'],
   manifest: {
     name: 'Arises Extension',
-    permissions: ['storage']
+    permissions: ['storage', 'sidePanel'],
+    host_permissions: ["*://*/*"], // Autoriser l'extension sur tous les sites
+    side_panel: {
+      default_path: "sidepanel.html", // Fichier HTML affiché
+    },
+    background: {
+      service_worker: "background.js",
+      type: "module"
+    },
+    action: {
+      default_title: "Ouvrir Arises"
+    }
   },
   outDir: 'dist',
   srcDir: 'src',

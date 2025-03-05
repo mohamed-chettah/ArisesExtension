@@ -11,16 +11,17 @@
   },
   "permissions": [
     "storage",
+    "sidePanel",
     "tabs",
     "scripting"
   ],
-  "commands": {
-    "wxt:reload-extension": {
-      "description": "Reload the extension during development",
-      "suggested_key": {
-        "default": "Alt+R"
-      }
-    }
+  "host_permissions": [
+    "*://*/*",
+    "*://*.google.com/*",
+    "http://localhost/*"
+  ],
+  "side_panel": {
+    "default_path": "sidepanel.html"
   },
   "background": {
     "service_worker": "background.js"
@@ -29,10 +30,14 @@
     "default_title": "Arises",
     "default_popup": "popup.html"
   },
-  "host_permissions": [
-    "*://*.google.com/*",
-    "http://localhost/*"
-  ],
+  "commands": {
+    "wxt:reload-extension": {
+      "description": "Reload the extension during development",
+      "suggested_key": {
+        "default": "Alt+R"
+      }
+    }
+  },
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval' http://localhost:3000; object-src 'self';",
     "sandbox": "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:3000; sandbox allow-scripts allow-forms allow-popups allow-modals; child-src 'self';"

@@ -99,14 +99,16 @@ var background = function() {
       );
   }
   const definition = defineBackground(() => {
-    chrome.action.onClicked.addListener(() => {
-      alert("test");
-      chrome.windows.create({
-        url: "popup/index.html",
-        type: "popup",
-        width: 600,
-        height: 800
-      });
+    chrome.runtime.onInstalled.addListener(() => {
+      chrome.sidePanel.setOptions({ enabled: true });
+    });
+    chrome.action.onClicked.addListener(async (tab) => {
+      const isAvailable = await chrome.sidePanel.isAvailable({ tabId: tab.id });
+      if (isAvailable) {
+        chrome.sidePanel.open({ tabId: tab.id });
+      } else {
+        console.warn("Side Panel non disponible sur cette page");
+      }
     });
   });
   function initPlugins() {
