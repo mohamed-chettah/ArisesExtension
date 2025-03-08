@@ -6,17 +6,28 @@ export default defineConfig({
   modules: ['@wxt-dev/module-vue', '@wxt-dev/auto-icons'],
   manifest: {
     name: 'Arises Extension',
-    permissions: ['storage', 'sidePanel'],
+    permissions: [
+    "identity",
+    "identity.email",
+    "storage",
+    "tabs"
+    ],
+    "web_accessible_resources": [{
+    "resources": ["oauth.html", "oauth.js"],
+    "matches": ["*://*/*"]
+    }],
     host_permissions: ["*://*/*"], // Autoriser l'extension sur tous les sites
     side_panel: {
-      default_path: "sidepanel.html", // Fichier HTML affiché
+      default_path: "views/sidepanel.html", // Fichier HTML affiché
     },
     background: {
       service_worker: "background.js",
-      type: "module"
     },
     action: {
       default_title: "Ouvrir Arises"
+    },
+    externally_connectable: {
+      matches: ["https://arises.vercel.app//*"] 
     }
   },
   outDir: 'dist',
@@ -30,5 +41,5 @@ export default defineConfig({
     css: {
       postcss: './postcss.config.cjs'
     },
-  })
+  }),  
 });

@@ -19,6 +19,13 @@ const errors = ref({})
 const googleError = ref('')
 const xError = ref('')
 
+onMounted(async () => {
+  let token = await storage.getItem('local:accessToken')
+  if(token){
+    router.push('dashboard')
+  }
+})
+
 // Fonction pour effacer les erreurs après un délai
 function clearErrorsAfterDelay(delay = 5000) {
   setTimeout(() => {
