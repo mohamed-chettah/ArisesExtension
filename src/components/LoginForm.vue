@@ -20,9 +20,29 @@ const googleError = ref('')
 const xError = ref('')
 
 onMounted(async () => {
-  let token = await storage.getItem('local:accessToken')
-  if(token){
+  // Middleware to redirect to the dashboard
+  let user = await storage.getItem('local:user')
+
+  // On envoi direct vers dashboard c'est au niveau des requêtes qu'on feras coté dashboard qu'on seras si c'est bon
+  if(user){
     router.push('dashboard')
+    return 
+  }
+
+  let token = await storage.getItem('local:accessToken')
+  let isOauth = await storage.getItem('local:isOauth')
+  if(isOauth && token){
+    const response = await axios.get('http://localhost:5005/api/auth/status/' + token)
+    if(response.status == 200){
+      storeData(response.data)
+      router.push('dashboard')
+    }
+  }
+  else if(token){
+    const isValid = await axios.get('http://localhost:5005/api/is-connected')
+    if(isValid){
+      router.push('dashboard')
+    }
   }
 })
 
@@ -115,7 +135,7 @@ async function handleXLogin(e) {
 }
 
 async function storeData(data) {
-  await storage.setItem('local:accessToken', data.access_token)
+  await storage.setItem('local:accessToken', data.token)
   await storage.setItem('local:user', data.user)
 }
 </script>
