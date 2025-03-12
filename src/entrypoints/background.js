@@ -8,6 +8,4 @@ export default defineBackground(() => {
             return true; // Permet d'utiliser sendResponse de manière asynchrone
         }
     });
-    
-    
 });

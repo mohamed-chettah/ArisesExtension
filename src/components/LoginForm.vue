@@ -4,9 +4,10 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ref, watch } from 'vue'
-import axios from 'axios'
+import api from '../lib/api'
 import { storage } from "wxt/storage"
 import { useRouter } from 'vue-router';
+import LoadingPage from "@/components/LoadingPage.vue";
 
 const router = useRouter();
 
@@ -18,30 +19,41 @@ const isXLoading = ref(false)
 const errors = ref({})
 const googleError = ref('')
 const xError = ref('')
+const loading = ref(false)
 
 onMounted(async () => {
-  // Middleware to redirect to the dashboard
-  let user = await storage.getItem('local:user')
 
-  // On envoi direct vers dashboard c'est au niveau des requêtes qu'on feras coté dashboard qu'on seras si c'est bon
-  if(user){
-    router.push('dashboard')
-    return 
+  // Récupérer les tokens du storage
+  let token = await storage.getItem('local:accessToken')
+
+  let isOauth = await storage.getItem('local:isOauth')
+
+  if (!token) {
+    loading.value = false
+    return
   }
 
-  let token = await storage.getItem('local:accessToken')
-  let isOauth = await storage.getItem('local:isOauth')
   if(isOauth && token){
-    const response = await axios.get('http://localhost:5005/api/auth/status/' + token)
-    if(response.status == 200){
-      storeData(response.data)
-      router.push('dashboard')
+    loading.value = true
+    const response = await api.get('http://localhost:5005/api/auth/status/' + token)
+
+    if(response.status === 200){
+      await storeData(response.data)
+      await router.push('dashboard')
+      loading.value = false
     }
   }
+
   else if(token){
-    const isValid = await axios.get('http://localhost:5005/api/is-connected')
-    if(isValid){
-      router.push('dashboard')
+    loading.value = true
+    const response = await api.get('http://localhost:5005/api/is-connected', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    if(response.data.isConnected){
+        await router.push('dashboard')
+        loading.value = false
     }
   }
 })
@@ -80,12 +92,12 @@ async function handleSubmit(e) {
   errors.value = {}
   try {
     console.log("Sending login request...")
-    const response = await axios.post('http://localhost:5005/api/login', {
+    const response = await api.post('http://localhost:5005/api/login', {
       email: email.value,
       password: password.value
     })
-    storeData(response.data)
-    router.push('/dashboard')
+    await storeData(response.data)
+    await router.push('/dashboard')
   } catch (error) {
     if (error.response?.data?.errors) {
       errors.value = error.response.data.errors
@@ -106,9 +118,9 @@ async function handleGoogleLogin(e) {
   googleError.value = ''
   try {
     console.log("Sending Google login request...")
-    const response = await axios.get('http://localhost:5005/api/auth/google')
+    const response = await api.get('http://localhost:5005/api/auth/google')
     if (response.data.url) {
-      chrome.tabs.create({ url: response.data.url });
+      await chrome.tabs.create({url: response.data.url});
     }
   } catch (error) {
     googleError.value = error.response?.data?.message || 'Failed to login with Google'
@@ -123,7 +135,7 @@ async function handleXLogin(e) {
   xError.value = ''
   try {
     console.log("Sending X login request...")
-    const response = await axios.get('http://localhost:5005/api/auth/twitter')
+    const response = await api.get('http://localhost:5005/api/auth/twitter')
     if (response.data.url) {
       chrome.tabs.create({ url: response.data.url });
     }
@@ -141,7 +153,11 @@ async function storeData(data) {
 </script>
 
 <template>
-  <div class="flex flex-col gap-6">
+  <div v-if="loading">
+    <LoadingPage :isLoading="loading" />
+  </div>
+
+  <div v-else class="flex flex-col gap-6">
     <Card class="overflow-hidden">
       <div class="flex flex-col items-center text-center">
           <h1 class="text-center text-[#D9D9D9]">
@@ -179,7 +195,7 @@ async function storeData(data) {
                   href="#"
                   class="ml-auto text-xs underline-offset-2 hover:underline"
                 >
-                  Forgot your password?
+<!--                  Forgot your password?-->
                 </a>
               </div>
               <Input 
@@ -202,8 +218,8 @@ async function storeData(data) {
             </Button>
 
             <a
-                  href="#"
-                  class="-mt-2 text-white text-xs ml-auto text-sm underline-offset-2 hover:underline"
+                  @click="router.push('/register')"
+                  class="cursor-pointer -mt-2 text-white text-xs ml-auto text-sm underline-offset-2 hover:underline"
                 >
                 Don't have an account?
                 </a>
