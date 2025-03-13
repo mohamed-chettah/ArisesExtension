@@ -25,15 +25,15 @@ onMounted(async () => {
 
   // Récupérer les tokens du storage
   let token = await storage.getItem('local:accessToken')
-
   let isOauth = await storage.getItem('local:isOauth')
+  let user = await storage.getItem('local:user')
 
   if (!token) {
     loading.value = false
     return
   }
 
-  if(isOauth && token){
+  if(isOauth && token && !user){
     loading.value = true
     const response = await api.get('http://localhost:5005/api/auth/status/' + token)
 
@@ -153,6 +153,7 @@ async function storeData(data) {
 </script>
 
 <template>
+  <img class="mx-auto" src="@/assets/arises.svg" alt="Arises logo" />
   <div v-if="loading">
     <LoadingPage :isLoading="loading" />
   </div>

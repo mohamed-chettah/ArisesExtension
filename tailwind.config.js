@@ -57,7 +57,8 @@ module.exports = {
   			},
   			'primary': '#445EF2',  // Couleur bleue
 			'secondary': '#A480F2', // Couleur violette
-			'black': '#000000' // Couleur orange
+			'black': '#000000', // Couleur noir
+			'dark-blue': '#1D1340' // Couleur noir
   		}
   	}
   },

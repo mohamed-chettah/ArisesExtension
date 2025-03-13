@@ -20,6 +20,10 @@ api.interceptors.response.use(
             storage.removeItem('local:oauth')
             router.push('/')
         }
+        else if (error.response && error.response.status === 404) {
+            console.log("Accès refusé");
+            router.push('/')
+        }
         return Promise.reject(error);
     }
 );
