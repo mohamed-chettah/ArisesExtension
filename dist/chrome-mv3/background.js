@@ -108,6 +108,31 @@ var background = function() {
         return true;
       }
     });
+    let timerInterval;
+    let pomodoroState = {};
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      if (message.action === "start-timer") {
+        if (pomodoroState === {}) {
+          return;
+        }
+        clearInterval(timerInterval);
+        pomodoroState = message.datas;
+        timerInterval = setInterval(() => {
+          pomodoroState.totalSeconds--;
+          if (pomodoroState.totalSeconds <= 0) {
+            clearInterval(timerInterval);
+          }
+          chrome.storage.local.set({ pomodoroState });
+        }, 1e3);
+      }
+      if (message.action === "stop-timer") {
+        if (pomodoroState === {}) {
+          return;
+        }
+        pomodoroState.isRunning = false;
+        clearInterval(timerInterval);
+      }
+    });
   });
   function initPlugins() {
   }

@@ -32,20 +32,12 @@
     "*://*.google.com/*",
     "http://localhost/*"
   ],
-  "side_panel": {
-    "default_path": "views/sidepanel.html"
-  },
   "background": {
     "service_worker": "background.js"
   },
   "action": {
     "default_title": "Arises",
     "default_popup": "popup.html"
-  },
-  "externally_connectable": {
-    "matches": [
-      "https://arises.vercel.app//*"
-    ]
   },
   "commands": {
     "wxt:reload-extension": {

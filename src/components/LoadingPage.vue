@@ -15,6 +15,6 @@ defineProps({
           </circle>
         </svg>
 
-        <p class="text-white">INITIALISATION</p>
+        <p class="text-white bank-gothic">INITIALISATION</p>
   </div>
 </template>

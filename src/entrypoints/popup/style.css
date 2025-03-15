@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'Bank Gothic Light';
+    src: url('../../../public/fonts/Bank Gothic Light Regular.otf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+.bank-gothic{
+    font-family: 'Bank Gothic Light', sans-serif;
+}

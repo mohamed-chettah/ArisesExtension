@@ -44,14 +44,14 @@ function startFocus() {
   currentMode.value = MODES.FOCUS
   totalSeconds.value = selectedFocusDuration.value * 60
   isRunning.value = false
-  saveState()
+  saveState("stop-timer")
 }
 
 function startShortBreak() {
   currentMode.value = MODES.SHORT_BREAK
   totalSeconds.value = shortBreakDuration.value * 60
   isRunning.value = false
-  saveState()
+  saveState("stop-timer")
 }
 
 function startLongBreak() {
@@ -59,7 +59,7 @@ function startLongBreak() {
   totalSeconds.value = longBreakDuration.value * 60
   isRunning.value = false
   cycleCount.value = 0
-  saveState()
+  saveState("stop-timer")
 }
 
 /**
@@ -76,7 +76,11 @@ function selectFocusDuration(duration) {
  */
 function toggleTimer() {
   isRunning.value = !isRunning.value
-  saveState()
+  if(isRunning.value) {
+    saveState("start-timer")
+  } else {
+    saveState("stop-timer")
+  }
 }
 
 /**
@@ -143,7 +147,7 @@ function loadFromChromeStorage(key, defaultValue) {
   })
 }
 
-async function saveState() {
+async function saveState(message) {
   await saveToChromeStorage('pomodoroState', {
     currentMode: currentMode.value,
     cycleCount: cycleCount.value,
@@ -151,6 +155,14 @@ async function saveState() {
     isRunning: isRunning.value,
     selectedFocusDuration: selectedFocusDuration.value
   })
+  let datas = {
+    currentMode: currentMode.value,
+    cycleCount: cycleCount.value,
+    totalSeconds: totalSeconds.value,
+    isRunning: isRunning.value,
+    selectedFocusDuration: selectedFocusDuration.value
+  }
+  await chrome.runtime.sendMessage({ action: message, datas: datas })
 }
 
 async function loadState() {
@@ -210,7 +222,7 @@ const timeFormatted = computed(() => {
 </script>
 
 <template>
-  <div class="p-5 flex flex-col gap-5 bg-dark-blue/70 text-white rounded-xl border-[0.5px] border-secondary shadow-2xl">
+  <div>
     <!-- Titre -->
     <h2 class="text-sm">Pomodoro</h2>
 
@@ -234,7 +246,7 @@ const timeFormatted = computed(() => {
     <div class="text-center">
       <!-- Indicateur du mode actuel -->
       <strong class="text-center font-semibold text-lg">{{ currentMode }}</strong>
-      <div class="text-3xl font-semibold mt-2">
+      <div class="bank-gothic text-3xl font-semibold mt-2">
         {{ timeFormatted }}
       </div>
       <p class="mt-1">Cycle : {{ cycleCount }}/4</p>
