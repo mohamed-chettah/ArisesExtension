@@ -1,101 +1,175 @@
-
+<!-- Pomodoro.vue -->
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { storage } from "wxt/storage"
 
-// -- 1. Durées par défaut (en minutes)
-const focusDuration = ref(25)
-const shortBreakDuration = ref(5)
-const longBreakDuration = ref(15)
-
-// -- 2. Les états possibles
+/**
+ * Liste des modes Pomodoro.
+ */
 const MODES = {
-  FOCUS: 'FOCUS',
-  SHORT_BREAK: 'SHORT_BREAK',
-  LONG_BREAK: 'LONG_BREAK'
+  FOCUS: 'Focus',
+  SHORT_BREAK: 'Short Break',
+  LONG_BREAK: 'Long Break'
 }
 
-// -- 3. State principal
+/**
+ * Liste possible pour la durée du focus (en minutes).
+ */
+const focusDurations = ref([5, 10, 15, 20, 25, 30, 45, 60, 90])
+const selectedFocusDuration = ref(25) // valeur par défaut : 25 minutes
+
+/**
+ * Durées (en minutes) pour la pause courte et la pause longue.
+ */
+const shortBreakDuration = ref(5)
+const longBreakDuration = ref(20)
+
+/**
+ * État principal du timer.
+ */
 const currentMode = ref(MODES.FOCUS)
-const cycleCount = ref(0) // Nombre de sessions focus terminées avant la pause longue
-const totalSeconds = ref(focusDuration.value * 60) // temps restant en secondes
+const cycleCount = ref(0)
+const totalSeconds = ref(selectedFocusDuration.value * 60)
 const isRunning = ref(false)
 
+/**
+ * Interval pour setInterval
+ */
 let intervalId = null
 
-// -- 4. Méthodes utilitaires
-
-// Passer au mode "focus"
+/**
+ * Fonctions de transition entre les modes
+ */
 function startFocus() {
   currentMode.value = MODES.FOCUS
-  totalSeconds.value = focusDuration.value * 60
+  totalSeconds.value = selectedFocusDuration.value * 60
   isRunning.value = false
+  saveState()
 }
 
-// Passer en petite pause
 function startShortBreak() {
   currentMode.value = MODES.SHORT_BREAK
   totalSeconds.value = shortBreakDuration.value * 60
   isRunning.value = false
+  saveState()
 }
 
-// Passer en longue pause
 function startLongBreak() {
   currentMode.value = MODES.LONG_BREAK
   totalSeconds.value = longBreakDuration.value * 60
   isRunning.value = false
-  cycleCount.value = 0 // on réinitialise le compteur de cycles
+  cycleCount.value = 0
+  saveState()
 }
 
-// Lance ou met en pause le timer
+/**
+ * Permet de changer la durée Focus.
+ * Dès qu'on change, on relance le mode Focus avec la nouvelle durée.
+ */
+function selectFocusDuration(duration) {
+  selectedFocusDuration.value = duration
+  startFocus()
+}
+
+/**
+ * Lance / met en pause le timer (toggle).
+ */
 function toggleTimer() {
   isRunning.value = !isRunning.value
+  saveState()
 }
 
-// Remet tout à zéro
+/**
+ * Reset complet : revient au premier Focus et cycleCount = 0
+ */
 function resetTimer() {
-  // On revient à un focus "pur"
   cycleCount.value = 0
   startFocus()
 }
 
-// Passe immédiatement à la prochaine étape (skip la session en cours)
+/**
+ * Skip la session en cours et passe immédiatement à la suivante.
+ */
 function skipSession() {
   if (currentMode.value === MODES.FOCUS) {
-    // On considère que c'est la fin d'un focus
     cycleCount.value++
     checkCycle()
   } else {
-    // On était en break, on repart sur une session Focus
     startFocus()
   }
+  saveState()
 }
 
-// Vérifie si on doit lancer une pause longue ou courte
+/**
+ * Vérifie s'il faut une pause longue ou courte en fin de Focus.
+ */
 function checkCycle() {
-  if (cycleCount.value >= 4) {
+  if (cycleCount.value > 4) {
     startLongBreak()
   } else {
     startShortBreak()
   }
 }
 
-// -- 5. Gestion du décompte (setInterval)
+/**
+ * tick() est appelé chaque seconde si isRunning = true.
+ */
 function tick() {
   totalSeconds.value--
-  // Si le timer arrive à 0, on enchaîne
   if (totalSeconds.value <= 0) {
     if (currentMode.value === MODES.FOCUS) {
-      // Fin d’une session focus => incrémenter cycle et voir si c’est pause longue ou courte
       cycleCount.value++
       checkCycle()
     } else {
-      // Fin d’une pause => on repart sur une session focus
       startFocus()
     }
   }
+  saveState()
 }
 
-onMounted(() => {
+/**
+ * Utilitaires pour chrome.storage.local
+ * (Assure-toi d'avoir "storage" dans les permissions de ton manifest.json)
+ */
+function saveToChromeStorage(key, data) {
+  storage.setItem('local:' + key, data)
+}
+
+function loadFromChromeStorage(key, defaultValue) {
+  return new Promise((resolve) => {
+    storage.getItem('local:' + key).then((result) => {
+      resolve(result ?? defaultValue)
+    })
+  })
+}
+
+async function saveState() {
+  await saveToChromeStorage('pomodoroState', {
+    currentMode: currentMode.value,
+    cycleCount: cycleCount.value,
+    totalSeconds: totalSeconds.value,
+    isRunning: isRunning.value,
+    selectedFocusDuration: selectedFocusDuration.value
+  })
+}
+
+async function loadState() {
+  const state = await loadFromChromeStorage('pomodoroState', null)
+  if (state) {
+    currentMode.value = state.currentMode
+    cycleCount.value = state.cycleCount
+    totalSeconds.value = state.totalSeconds
+    isRunning.value = state.isRunning
+    selectedFocusDuration.value = state.selectedFocusDuration
+  }
+}
+
+/**
+ * Lifecycle hooks
+ */
+onMounted(async () => {
+  await loadState()
+  // Lance le timer (vérifie toutes les secondes si isRunning = true)
   intervalId = setInterval(() => {
     if (isRunning.value) {
       tick()
@@ -105,172 +179,126 @@ onMounted(() => {
 
 onUnmounted(() => {
   clearInterval(intervalId)
+  saveState()
 })
 
-// -- 6. Calculs pour l’affichage
-const minutes = computed(() => {
-  return Math.floor(totalSeconds.value / 60)
-})
-const seconds = computed(() => {
-  return totalSeconds.value % 60
-})
-const secondsFormatted = computed(() => {
-  return seconds.value < 10 ? '0' + seconds.value : seconds.value
-})
+/**
+ * Computed property pour l'affichage du temps.
+ * - Affiche HH:MM:SS si >= 1 heure
+ * - Sinon, affiche MM:SS
+ */
+const timeFormatted = computed(() => {
+  const total = totalSeconds.value
 
-// -- 7. Loader circulaire (progress ring)
-const radius = 50
-const strokeWidth = 8
-const circumference = 2 * Math.PI * (radius - strokeWidth / 2)
+  // Heures
+  const hours = Math.floor(total / 3600)
+  // Reste de secondes après avoir retiré les heures
+  const remainder = total % 3600
+  // Minutes
+  const mins = Math.floor(remainder / 60)
+  // Secondes
+  const secs = remainder % 60
 
-// Proportion du temps restant = (totalSeconds / (modeDuration))
-//   -> on détermine la durée "totale" pour le mode en cours
-function getCurrentModeMaxSeconds() {
-  switch (currentMode.value) {
-    case MODES.FOCUS:
-      return focusDuration.value * 60
-    case MODES.SHORT_BREAK:
-      return shortBreakDuration.value * 60
-    case MODES.LONG_BREAK:
-      return longBreakDuration.value * 60
+  if (hours > 0) {
+    // Format HH:MM:SS
+    return `${hours}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
+  } else {
+    // Format MM:SS
+    return `${mins}:${String(secs).padStart(2, '0')}`
   }
-}
-
-// On calcule la fraction du cercle à “remplir”
-const dashOffset = computed(() => {
-  const max = getCurrentModeMaxSeconds()
-  const fraction = totalSeconds.value / max
-  return circumference * (1 - fraction)
 })
 </script>
 
-
 <template>
-  <div class="p-5 bg-dark-blue text-white">
-    <h2 class="text-sm font-semibold">Pomodoro</h2>
+  <div class="p-5 flex flex-col gap-5 bg-dark-blue/70 text-white rounded-xl border-[0.5px] border-secondary shadow-2xl">
+    <!-- Titre -->
+    <h2 class="text-sm">Pomodoro</h2>
 
-    <!-- Sélecteur de durées (exemple) -->
-    <div class="controls text-black">
-      <label>Focus Time (min)</label>
-      <input type="number" v-model.number="focusDuration" min="1" />
-
-      <label>Short Break (min)</label>
-      <input type="number" v-model.number="shortBreakDuration" min="1" />
-
-      <label>Long Break (min)</label>
-      <input type="number" v-model.number="longBreakDuration" min="1" />
-    </div>
-
-    <!-- Indicateur du mode actuel -->
-    <p>Mode actuel : <strong>{{ currentMode }}</strong></p>
-    <p>Cycle : {{ cycleCount }}/4</p>
-
-    <!-- Cercle de progression + affichage du temps -->
-    <div class="timer-wrapper">
-      <svg
-          class="progress-ring"
-          :width="radius * 2"
-          :height="radius * 2"
+    <!-- Boutons de choix de durée (Focus) -->
+    <div class="flex gap-2 flex-wrap justify-center mb-2">
+      <button
+          v-for="duration in focusDurations"
+          :key="duration"
+          @click="selectFocusDuration(duration)"
+          :class="[
+          'py-1 px-3 rounded-lg transition',
+          duration === selectedFocusDuration
+            ? 'bg-secondary text-white'
+            : 'bg-secondary/40 text-white hover:bg-secondary'
+        ]"
       >
-        <!-- Cercle de fond (pas animé, sert de repère) -->
-        <circle
-            class="progress-ring__background"
-            :r="radius - strokeWidth / 2"
-            :cx="radius"
-            :cy="radius"
-            :stroke-width="strokeWidth"
-        />
-        <!-- Cercle animé -->
-        <circle
-            class="progress-ring__progress"
-            :r="radius - strokeWidth / 2"
-            :cx="radius"
-            :cy="radius"
-            :stroke-width="strokeWidth"
-            :stroke-dasharray="circumference"
-            :stroke-dashoffset="dashOffset"
-        />
-      </svg>
-      <div class="time-display">
-        {{ minutes }}:{{ secondsFormatted }}
-      </div>
+        {{ duration }}
+      </button>
     </div>
 
-    <!-- Boutons -->
-    <div class="buttons">
-      <button @click="toggleTimer">
-        {{ isRunning ? 'Pause' : 'Start' }}
+    <div class="text-center">
+      <!-- Indicateur du mode actuel -->
+      <strong class="text-center font-semibold text-lg">{{ currentMode }}</strong>
+      <div class="text-3xl font-semibold mt-2">
+        {{ timeFormatted }}
+      </div>
+      <p class="mt-1">Cycle : {{ cycleCount }}/4</p>
+    </div>
+
+    <!-- Boutons de contrôle (Reset, Play/Pause, Skip) -->
+    <div class="flex gap-2 justify-center mt-4">
+      <!-- Reset -->
+      <button class="second-button-time" @click="resetTimer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+          <path
+              fill="currentColor"
+              fill-rule="evenodd"
+              d="M4.755 10.059a7.5 7.5 0 0 1 12.548-3.364l1.903 1.903h-3.183a.75.75 0 1 0 0 1.5h4.992a.75.75 0 0 0 .75-.75V4.356a.75.75 0 0 0-1.5 0v3.18l-1.9-1.9A9 9 0 0 0 3.306 9.67a.75.75 0 1 0 1.45.388m15.408 3.352a.75.75 0 0 0-.919.53a7.5 7.5 0 0 1-12.548 3.364l-1.902-1.903h3.183a.75.75 0 0 0 0-1.5H2.984a.75.75 0 0 0-.75.75v4.992a.75.75 0 0 0 1.5 0v-3.18l1.9 1.9a9 9 0 0 0 15.059-4.035a.75.75 0 0 0-.53-.918"
+              clip-rule="evenodd"
+          />
+        </svg>
+        Reset
       </button>
-      <button @click="resetTimer">Reset</button>
-      <button @click="skipSession">Skip</button>
+
+      <!-- Play / Pause -->
+      <button class="main-button-time" @click="toggleTimer">
+        <template v-if="isRunning">
+          <!-- Icône Pause -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20">
+            <path
+                fill="currentColor"
+                d="M5.75 3a.75.75 0 0 0-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 0 0 .75-.75V3.75A.75.75 0 0 0 7.25 3zm7 0a.75.75 0 0 0-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 0 0 .75-.75V3.75a.75.75 0 0 0-.75-.75z"
+            />
+          </svg>
+        </template>
+        <template v-else>
+          <!-- Icône Play -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20">
+            <path
+                fill="currentColor"
+                d="M6.3 2.84A1.5 1.5 0 0 0 4 4.11v11.78a1.5 1.5 0 0 0 2.3 1.27l9.344-5.891a1.5 1.5 0 0 0 0-2.538z"
+            />
+          </svg>
+        </template>
+      </button>
+
+      <!-- Skip -->
+      <button class="second-button-time" @click="skipSession">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+          <path
+              fill="currentColor"
+              d="M5.055 7.06c-1.25-.713-2.805.19-2.805 1.63v8.122c0 1.44 1.555 2.343 2.805 1.628L12 14.471v2.34c0 1.44 1.555 2.343 2.805 1.628l7.108-4.061c1.26-.72 1.26-2.536 0-3.256l-7.108-4.061C13.555 6.346 12 7.249 12 8.689v2.34z"
+          />
+        </svg>
+        Skip
+      </button>
     </div>
   </div>
 </template>
 
 <style scoped>
-.pomodoro-container {
-  max-width: 400px;
-  margin: 0 auto;
-  text-align: center;
-  padding: 1rem;
+.main-button-time {
+  @apply bg-secondary p-2 rounded-lg flex items-center gap-2;
+  /* Adapte selon ton design */
 }
 
-.controls {
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 1rem;
-}
-.controls label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-}
-.controls input {
-  width: 60px;
-  padding: 0.25rem;
-  text-align: center;
-}
-
-.timer-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-.progress-ring {
-  transform: rotate(-90deg); /* Tourner pour que le cercle parte du haut */
-}
-.progress-ring__background,
-.progress-ring__progress {
-  fill: none;
-  stroke: #ddd;
-  r: 45;
-  cx: 50;
-  cy: 50;
-}
-.progress-ring__background {
-  stroke: #eeeeee;
-}
-.progress-ring__progress {
-  stroke: #7c3aed; /* Violet */
-  stroke-linecap: round;
-  transition: stroke-dashoffset 0.5s ease;
-}
-
-.time-display {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-.buttons {
-  margin-top: 1rem;
-}
-
-.buttons button {
-  margin: 0 0.5rem;
-  padding: 0.5rem 1rem;
+.second-button-time {
+  @apply bg-secondary/60 p-2 rounded-lg flex items-center gap-2;
+  /* Adapte selon ton design */
 }
 </style>
