@@ -119,8 +119,9 @@ var background = function() {
         pomodoroState = message.datas;
         timerInterval = setInterval(() => {
           pomodoroState.totalSeconds--;
-          if (pomodoroState.totalSeconds <= 0) {
+          if (pomodoroState.totalSeconds <= 1) {
             clearInterval(timerInterval);
+            chrome.tabs.create({ url: "chrome-extension:/fjjenhlhpcdimhbdbfachdhndiiejgjo/views/break.html" });
           }
           chrome.storage.local.set({ pomodoroState });
         }, 1e3);

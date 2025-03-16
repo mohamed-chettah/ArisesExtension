@@ -15,7 +15,7 @@ const MODES = {
 /**
  * Liste possible pour la durée du focus (en minutes).
  */
-const focusDurations = ref([5, 10, 15, 20, 25, 30, 45, 60, 90])
+const focusDurations = ref([0.1, 10, 15, 20, 25, 30, 45, 60, 90])
 const selectedFocusDuration = ref(25) // valeur par défaut : 25 minutes
 
 /**
@@ -126,6 +126,11 @@ function tick() {
       checkCycle()
     } else {
       startFocus()
+    }
+  }
+  else {
+    if (currentMode.value === MODES.FOCUS) {
+      chrome.runtime.sendMessage({ action: "redirect" });
     }
   }
   saveState()

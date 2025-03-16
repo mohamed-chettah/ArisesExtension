@@ -23,9 +23,9 @@ export default defineBackground(() => {
             pomodoroState = message.datas
             timerInterval = setInterval(() => {
                 pomodoroState.totalSeconds--;
-                if (pomodoroState.totalSeconds <= 0) {
-                    // envoyer événement à la popup ou changer d'état
+                if (pomodoroState.totalSeconds <= 1) {
                     clearInterval(timerInterval);
+                    chrome.tabs.create({ url: 'chrome-extension:/fjjenhlhpcdimhbdbfachdhndiiejgjo/views/break.html' });
                 }
                 chrome.storage.local.set({ pomodoroState });
             }, 1000);

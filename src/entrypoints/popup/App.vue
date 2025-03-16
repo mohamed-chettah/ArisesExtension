@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 
 const width = computed(() => {
-  if(router.currentRoute.value.path === '/'){
+  if(router.currentRoute.value.path === '/' || router.currentRoute.value.path === '/register'){
     return 'w-[400px]'
   } else {
     return 'w-[500px]'

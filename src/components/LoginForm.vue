@@ -154,6 +154,9 @@ async function storeData(data) {
 
 <template>
   <img class="mx-auto" src="@/assets/arises.svg" alt="Arises logo" />
+  <h1 class="text-center text-[#D9D9D9]">
+    Rise Above. Go Beyond
+  </h1>
   <div v-if="loading">
     <LoadingPage :isLoading="loading" />
   </div>
@@ -161,9 +164,7 @@ async function storeData(data) {
   <div v-else class="flex flex-col gap-6">
     <Card class="overflow-hidden">
       <div class="flex flex-col items-center text-center">
-          <h1 class="text-center text-[#D9D9D9]">
-            Rise Above. Go Beyond 
-          </h1>
+
       </div>
       <CardContent class="grid p-0 md:grid-cols-2">
         <form @submit="handleSubmit" class="p-6 md:p-8">

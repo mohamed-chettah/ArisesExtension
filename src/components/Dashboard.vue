@@ -35,7 +35,7 @@ onMounted(async () => {
           <img class="w-[50px] h-[50px] ml-[10px] rounded-xl border-secondary border-[1px]" src="https://avatars.githubusercontent.com/u/120135426?v=4" alt="User avatar" />
           <div class="">
             <p class="text-white text-sm bank-gothic">{{ username.toUpperCase()}} 🏴‍☠️</p>
-            <p class="text-white/70 text-xs bank-gothic">Rang E</p>
+            <p class="text-white/70 text-xs bank-gothic">Grade E</p>
           </div>
         </div>
       </div>

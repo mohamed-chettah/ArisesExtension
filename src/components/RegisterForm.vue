@@ -67,6 +67,8 @@ async function storeData(data) {
 </script>
 
 <template>
+  <img class="mx-auto" src="@/assets/arises.svg" alt="Arises logo" />
+
   <div v-if="loading">
     <LoadingPage :isLoading="loading" />
   </div>
@@ -75,7 +77,7 @@ async function storeData(data) {
     <Card class="overflow-hidden">
       <div class="flex flex-col items-center text-center">
         <h1 class="text-center text-[#D9D9D9]">
-          Sign Up - Join Arises
+          Rise Above. Go Beyond
         </h1>
       </div>
 
