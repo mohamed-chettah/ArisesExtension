@@ -214,7 +214,7 @@ async function storeData(data) {
               </div>
             </div>
 
-            <Button type="submit" class="w-full bg-primary text-white" :disabled="isLoading">
+            <Button type="submit" class="w-full bg-secondary text-white" :disabled="isLoading">
               <span v-if="isLoading"></span>
               {{ isLoading ? 'Loading...' : 'Continue' }}
             </Button>

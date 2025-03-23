@@ -18,11 +18,11 @@ api.interceptors.response.use(
             storage.removeItem('local:accessToken')
             storage.removeItem('local:user')
             storage.removeItem('local:oauth')
-            router.push('/')
+            location.reload()
         }
         else if (error.response && error.response.status === 404) {
             console.log("Accès refusé");
-            router.push('/')
+            location.reload()
         }
         return Promise.reject(error);
     }

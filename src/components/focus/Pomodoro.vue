@@ -260,7 +260,7 @@ const timeFormatted = computed(() => {
     <!-- Boutons de contrôle (Reset, Play/Pause, Skip) -->
     <div class="flex gap-2 justify-center mt-4">
       <!-- Reset -->
-      <button class="second-button-time" @click="resetTimer">
+      <button class="second-button-time " @click="resetTimer">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
           <path
               fill="currentColor"
@@ -310,12 +310,12 @@ const timeFormatted = computed(() => {
 
 <style scoped>
 .main-button-time {
-  @apply bg-secondary p-2 rounded-lg flex items-center gap-2;
+  @apply bg-secondary p-2 rounded-lg flex items-center gap-2 hover:bg-secondary/80;
   /* Adapte selon ton design */
 }
 
 .second-button-time {
-  @apply bg-secondary/60 p-2 rounded-lg flex items-center gap-2;
+  @apply bg-secondary/60 p-2 rounded-lg flex items-center gap-2 hover:bg-secondary/80;
   /* Adapte selon ton design */
 }
 </style>
