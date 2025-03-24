@@ -40,4 +40,26 @@ export default defineBackground(() => {
         }
     });
 
+    // Blocage des sites
+    chrome.webRequest.onBeforeRequest.addListener(
+        async (details) => {
+            const blockedList = await storage.getItem('local:listWebsite') || []
+
+            const hostname = new URL(details.url).hostname
+            console.log(hostname)
+
+            const isBlocked = blockedList.some((item) =>
+                hostname.includes(item.website.website_name.toLowerCase())
+            )
+
+            if (isBlocked) {
+                return {
+                    redirectUrl: chrome.runtime.getURL("blocked.html")
+                }
+            }
+        },
+        { urls: ["<all_urls>"], types: ["main_frame"] },
+        ["blocking"]
+    )
+
 });

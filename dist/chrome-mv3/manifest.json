@@ -14,21 +14,24 @@
     "identity.email",
     "storage",
     "tabs",
+    "webRequest",
+    "webRequestBlocking",
     "scripting"
   ],
   "web_accessible_resources": [
     {
       "resources": [
         "oauth.html",
-        "oauth.js"
+        "oauth.js",
+        "blocked.html"
       ],
       "matches": [
-        "*://*/*"
+        "<all_urls>"
       ]
     }
   ],
   "host_permissions": [
-    "*://*/*",
+    "<all_urls>",
     "*://*.google.com/*",
     "http://localhost/*"
   ],
