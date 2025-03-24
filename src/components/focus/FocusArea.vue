@@ -10,7 +10,14 @@ import BlockerWebsite from "@/components/focus/BlockerWebsite.vue";
 
   <div class="grid grid-cols-12 gap-5">
     <Pomodoro class="card col-span-6" />
-    <BlockerWebsite class="card col-span-6"/>
+    <Suspense>
+      <template #default>
+        <BlockerWebsite class="card col-span-6" />
+      </template>
+      <template #fallback>
+        <div>Chargement...</div>
+      </template>
+    </Suspense>
   </div>
 
 </template>

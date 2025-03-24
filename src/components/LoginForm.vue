@@ -45,16 +45,7 @@ onMounted(async () => {
   }
 
   else if(token){
-    loading.value = true
-    const response = await api.get('http://localhost:5005/api/is-connected', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    if(response.data.isConnected){
-        await router.push('dashboard')
-        loading.value = false
-    }
+    await router.push('dashboard')
   }
 })
 
