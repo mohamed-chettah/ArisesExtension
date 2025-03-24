@@ -49,12 +49,14 @@ onMounted(() => {
         <AddWebsite
             :isLoading="isLoading"
             :newWebsite="newWebsite"
+            @fetchWebsite="fetchWebsites"
         />
       </PopoverContent>
     </Popover>
 
     <TableWebsite 
       :listWebsite="listWebsite"
+      @fetchWebsite="fetchWebsites"
     />
   </div>
 </template>

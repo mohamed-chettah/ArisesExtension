@@ -1,6 +1,11 @@
 <script setup lang="ts">
 
+import api from '../../lib/api'
+
+const emit = defineEmits(['fetchWebsite'])
+
 type Website = {
+  id: number;
   website : {
     id: number;
     favicon: string;
@@ -13,18 +18,30 @@ defineProps<{
   listWebsite: Website[]
 }>();
 
-function deleteItem(item : Website){
+let token = await storage.getItem('local:accessToken')
+async function deleteItem(item : Website){
   console.log('deleteItem')
   console.log(item)
   if(confirm('Are you sure you want to delete this item?')){
-    console.log('delete')
+    try {
+      await api.delete('http://localhost:5005/api/user-website/' + item.id, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      // emit
+      emit('fetchWebsite')
+    } catch (error) {
+      console.error('Error fetching websites:', error);
+    }
   }
 }
 
 </script>
 
 <template>
-  <div class="rounded-lg p-2 w-fit bg-[#1c1b2e]">
+  <div class="rounded-lg p-2 w-fit bg-black border-[0.5px] border-secondary shadow-2xl">
     <table class="text-white table-fixed w-full border-collapse">
       <tbody>
       <tr

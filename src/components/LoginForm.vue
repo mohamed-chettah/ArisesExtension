@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ref, watch } from 'vue'
-import api from '../lib/api'
+import api from '../lib/api.ts'
 import { storage } from "wxt/storage"
 import { useRouter } from 'vue-router';
 import LoadingPage from "@/components/LoadingPage.vue";

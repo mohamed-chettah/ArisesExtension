@@ -1,13 +1,10 @@
 import axios from 'axios';
 import { storage } from "wxt/storage"
-import { useRouter } from 'vue-router'
 // Création d'une instance Axios avec l'URL de base
 const api = axios.create({
     baseURL: 'http://localhost:5005/api', // Remplace par ton URL
     headers: { 'Content-Type': 'application/json' }
 });
-
-const router = useRouter()
 
 // Ajouter un intercepteur pour gérer l'expiration du token
 api.interceptors.response.use(
