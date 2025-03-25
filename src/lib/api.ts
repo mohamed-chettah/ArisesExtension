@@ -10,15 +10,11 @@ const api = axios.create({
 api.interceptors.response.use(
     response => response, // Si tout va bien, renvoyer la réponse normalement
     error => {
-        if (error.response && error.response.status === 401) {
+        if (error.response && error.response.status in [401, 403]) {
             console.log("Token expiré, déconnexion...");
             storage.removeItem('local:accessToken')
             storage.removeItem('local:user')
             storage.removeItem('local:oauth')
-            location.reload()
-        }
-        else if (error.response && error.response.status === 404) {
-            console.log("Accès refusé");
             location.reload()
         }
         return Promise.reject(error);

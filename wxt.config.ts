@@ -18,6 +18,14 @@ export default defineConfig({
     "resources": ["oauth.html", "oauth.js", "blocked.html"],
     "matches": ["<all_urls>"]
     }],
+    declarative_net_request : {
+      "rule_resources" : [{
+        "id": "ruleset_1",
+        "enabled": true,
+        "path": "scripts/rules_1.json"
+      }
+      ]
+    },
     host_permissions: ["<all_urls>"],
     background: {
       service_worker: "background.js",

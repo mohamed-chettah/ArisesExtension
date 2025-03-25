@@ -14,8 +14,8 @@
     "identity.email",
     "storage",
     "tabs",
-    "webRequest",
-    "webRequestBlocking",
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess",
     "scripting"
   ],
   "web_accessible_resources": [
@@ -30,6 +30,15 @@
       ]
     }
   ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ruleset_1",
+        "enabled": true,
+        "path": "scripts/rules_1.json"
+      }
+    ]
+  },
   "host_permissions": [
     "<all_urls>",
     "*://*.google.com/*",

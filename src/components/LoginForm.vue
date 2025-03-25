@@ -22,6 +22,7 @@ const xError = ref('')
 const loading = ref(false)
 
 onMounted(async () => {
+  loading.value = true
 
   // Récupérer les tokens du storage
   let token = await storage.getItem('local:accessToken')

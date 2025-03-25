@@ -38,28 +38,57 @@ export default defineBackground(() => {
             pomodoroState.isRunning = false;
             clearInterval(timerInterval);
         }
+
+        if(message.action === "launch-blocker"){
+            console.log('Blocker launched')
+            updateBlockingStatus();
+
+        }
     });
+    
+    /**
+     * Crée des règles à partir des sites à bloquer
+     */
+    function buildRulesFromSites(sites) {
+        return sites.listWebsite.map((site, index) => {
+            const rawUrl = site.website.website_url;
+            const cleanedDomain = rawUrl
+                .replace(/^https?:\/\//, '') // retire https:// ou http://
+                .replace(/^www\./, '')       // retire www.
+                .split('/')[0];              // garde uniquement le domaine
 
-    // Blocage des sites
-    chrome.webRequest.onBeforeRequest.addListener(
-        async (details) => {
-            const blockedList = await storage.getItem('local:listWebsite') || []
+            return {
+                id: index + 1000,
+                priority: 1,
+                action: {
+                    type: 'redirect',
+                    redirect: { extensionPath: '/views/blocked.html' },
+                },
+                condition: {
+                    urlFilter: `||${cleanedDomain}`,
+                    resourceTypes: ['main_frame'],
+                },
+            };
+        });
+    }
 
-            const hostname = new URL(details.url).hostname
-            console.log(hostname)
+    /**
+     * Met à jour les règles dynamiques selon l'état dans localStorage
+     */
+    async function updateBlockingStatus() {
+        const rawSites =  await chrome.storage.local.get('listWebsite');
+        console.log(rawSites)
+        const sites = rawSites ? rawSites : [];
 
-            const isBlocked = blockedList.some((item) =>
-                hostname.includes(item.website.website_name.toLowerCase())
-            )
+        const rules = buildRulesFromSites(sites);
 
-            if (isBlocked) {
-                return {
-                    redirectUrl: chrome.runtime.getURL("blocked.html")
-                }
-            }
-        },
-        { urls: ["<all_urls>"], types: ["main_frame"] },
-        ["blocking"]
-    )
+        console.log(rules)
+
+        // Toujours supprimer les anciennes règles dynamiques
+        await chrome.declarativeNetRequest.updateDynamicRules({
+            removeRuleIds: rules.map((r) => r.id),
+            addRules: rules ? rules : [],
+        });
+    }
 
 });

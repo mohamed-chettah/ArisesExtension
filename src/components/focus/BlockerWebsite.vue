@@ -11,6 +11,16 @@ const listWebsite = ref([]);
 const isLoading = ref(false);
 let token = await storage.getItem('local:accessToken')
 
+onMounted(async () => {
+  let storeWebsite = await storage.getItem('local:listWebsite')
+  if(!storeWebsite){
+    await fetchWebsites();
+  }
+  else {
+    listWebsite.value = storeWebsite
+  }
+});
+
 const fetchWebsites = async () => {
   try {
     isLoading.value = true;
@@ -30,15 +40,11 @@ const fetchWebsites = async () => {
   }
 };
 
-onMounted(async () => {
-  let storeWebsite = await storage.getItem('local:listWebsite')
-  if(!storeWebsite){
-    await fetchWebsites();
-  }
-  else {
-    listWebsite.value = storeWebsite
-  }
-});
+function arise(){
+  chrome.runtime.sendMessage({ action: "launch-blocker" });
+  alert('Blocker is launched')
+}
+
 </script>
 
 <template>
@@ -77,7 +83,7 @@ onMounted(async () => {
       @fetchWebsite="fetchWebsites"
     />
 
-    <Button class=" bg-secondary rounded-lg hover:bg-secondary/80 text-xs">
+    <Button @click="arise" class=" bg-secondary rounded-lg hover:bg-secondary/80 bank-gothic ">
       <svg class="text-white" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path  fill="currentColor" d="m9 4l2.5 5.5L17 12l-5.5 2.5L9 20l-2.5-5.5L1 12l5.5-2.5zm0 4.83L8 11l-2.17 1L8 13l1 2.17L10 13l2.17-1L10 11zM19 9l-1.26-2.74L15 5l2.74-1.25L19 1l1.25 2.75L23 5l-2.75 1.26zm0 14l-1.26-2.74L15 19l2.74-1.25L19 15l1.25 2.75L23 19l-2.75 1.26z"/></svg>
       Arise</Button>
 
