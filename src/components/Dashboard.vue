@@ -10,6 +10,8 @@ function logout(){
   storage.removeItem('local:accessToken')
   storage.removeItem('local:user')
   storage.removeItem('local:oauth')
+  storage.setItem('local:isActiveBlocker', false)
+  chrome.runtime.sendMessage({ action: "stop-blocker" });
   router.push('/')
 }
 

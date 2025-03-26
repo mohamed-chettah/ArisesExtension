@@ -2,6 +2,13 @@
 
 import Pomodoro from "@/components/focus/Pomodoro.vue";
 import BlockerWebsite from "@/components/focus/BlockerWebsite.vue";
+
+const blockerWebsiteRef = ref();
+
+function arise() {
+  blockerWebsiteRef.value?.arise();
+}
+
 </script>
 
 <template>
@@ -9,10 +16,10 @@ import BlockerWebsite from "@/components/focus/BlockerWebsite.vue";
   <h1 class="text-white mb-4 text-lg font-normal">Focus Area</h1>
 
   <div class="grid grid-cols-12 gap-5">
-    <Pomodoro class="card col-span-6" />
+    <Pomodoro @arise="arise" class="card col-span-6" />
     <Suspense>
       <template #default>
-        <BlockerWebsite class="card col-span-6" />
+        <BlockerWebsite ref="blockerWebsiteRef" class="card col-span-6" />
       </template>
       <template #fallback>
         <div>Chargement...</div>

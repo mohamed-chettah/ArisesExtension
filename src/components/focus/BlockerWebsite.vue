@@ -10,6 +10,7 @@ import {storage} from "wxt/storage";
 const listWebsite = ref([]);
 const isLoading = ref(false);
 let token = await storage.getItem('local:accessToken')
+let isActiveBlocker = ref(!!(await storage.getItem('local:isActiveBlocker')))
 
 onMounted(async () => {
   let storeWebsite = await storage.getItem('local:listWebsite')
@@ -41,10 +42,20 @@ const fetchWebsites = async () => {
 };
 
 function arise(){
+  isActiveBlocker.value = true
+  storage.setItem('local:isActiveBlocker', true)
   chrome.runtime.sendMessage({ action: "launch-blocker" });
-  alert('Blocker is launched')
 }
 
+function stop(){
+  isActiveBlocker.value = false
+  storage.setItem('local:isActiveBlocker', false)
+  chrome.runtime.sendMessage({ action: "stop-blocker" });
+}
+
+defineExpose({
+  arise
+});
 </script>
 
 <template>
@@ -62,28 +73,25 @@ function arise(){
           <AddWebsite
               :isLoading="isLoading"
               @fetchWebsite="fetchWebsites"
+              @arise="arise"
           />
         </PopoverContent>
       </Popover>
     </div>
 
-
-    <div v-if="isLoading" class="w-full rounded-lg p-2 flex justify-center bg-black border-[0.5px] border-secondary shadow-2xl">
-      <svg width="30" height="30" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="25" cy="25" r="20" stroke="white" stroke-width="4" fill="none"
-                stroke-dasharray="100" stroke-dashoffset="0">
-          <animateTransform attributeType="XML" attributeName="transform" type="rotate"
-                            from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/>
-        </circle>
-      </svg>
-    </div>
-
-    <TableWebsite v-else
-      :listWebsite="listWebsite"
-      @fetchWebsite="fetchWebsites"
+    <TableWebsite
+        :isLoading="isLoading"
+        :listWebsite="listWebsite"
+        @fetchWebsite="fetchWebsites"
+        :isActiveBlocker="isActiveBlocker"
     />
 
-    <Button @click="arise" class=" bg-secondary rounded-lg hover:bg-secondary/80 bank-gothic ">
+    <Button v-if="isActiveBlocker" @click="stop" class=" bg-secondary rounded-lg hover:bg-secondary/80 bank-gothic ">
+      <svg class="text-white" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path  fill="currentColor" d="M12 2C6.47 2 2 6.5 2 12s4.47 10 10 10s10-4.5 10-10S17.53 2 12 2zM9 15.59l-1.41-1.41L12 10.17l4.59 4.58L16 15l-4-4l-3.59 3.59z"/></svg>
+      Stop
+    </Button>
+
+    <Button v-else @click="arise" class=" bg-secondary rounded-lg hover:bg-secondary/80 bank-gothic ">
       <svg class="text-white" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path  fill="currentColor" d="m9 4l2.5 5.5L17 12l-5.5 2.5L9 20l-2.5-5.5L1 12l5.5-2.5zm0 4.83L8 11l-2.17 1L8 13l1 2.17L10 13l2.17-1L10 11zM19 9l-1.26-2.74L15 5l2.74-1.25L19 1l1.25 2.75L23 5l-2.75 1.26zm0 14l-1.26-2.74L15 19l2.74-1.25L19 15l1.25 2.75L23 19l-2.75 1.26z"/></svg>
       Arise</Button>
 

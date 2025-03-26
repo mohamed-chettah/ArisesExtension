@@ -10,11 +10,16 @@ const api = axios.create({
 api.interceptors.response.use(
     response => response, // Si tout va bien, renvoyer la réponse normalement
     error => {
-        if (error.response && error.response.status in [401, 403]) {
+        if (error.response && error.response.status == 401 || error.response.status == 403) {
             console.log("Token expiré, déconnexion...");
             storage.removeItem('local:accessToken')
             storage.removeItem('local:user')
             storage.removeItem('local:oauth')
+
+            storage.setItem('local:isActiveBlocker', false)
+            chrome.runtime.sendMessage({ action: "stop-blocker" });
+            // close all tabs
+            window.close()
             location.reload()
         }
         return Promise.reject(error);

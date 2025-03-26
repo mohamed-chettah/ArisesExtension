@@ -3,6 +3,8 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { storage } from "wxt/storage"
 
+const emit = defineEmits(['arise'])
+
 /**
  * Liste des modes Pomodoro.
  */
@@ -44,6 +46,7 @@ function startFocus() {
   currentMode.value = MODES.FOCUS
   totalSeconds.value = selectedFocusDuration.value * 60
   isRunning.value = false
+  emit('arise')
   saveState("stop-timer")
 }
 

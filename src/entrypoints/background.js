@@ -40,9 +40,11 @@ export default defineBackground(() => {
         }
 
         if(message.action === "launch-blocker"){
-            console.log('Blocker launched')
             updateBlockingStatus();
+        }
 
+        if(message.action === "stop-blocker"){
+            updateBlockingStatus(true);
         }
     });
     
@@ -75,20 +77,30 @@ export default defineBackground(() => {
     /**
      * Met à jour les règles dynamiques selon l'état dans localStorage
      */
-    async function updateBlockingStatus() {
-        const rawSites =  await chrome.storage.local.get('listWebsite');
-        console.log(rawSites)
-        const sites = rawSites ? rawSites : [];
+    async function updateBlockingStatus(remove = false) {
+        const rawSites = await chrome.storage.local.get('listWebsite');
+        const sites = rawSites?.listWebsite || [];
 
-        const rules = buildRulesFromSites(sites);
+        // On génère les règles à partir des sites
+        const rules = buildRulesFromSites({ listWebsite: sites });
 
-        console.log(rules)
+        // Si on souhaite supprimer les règles
+        if (remove) {
+            await chrome.declarativeNetRequest.updateDynamicRules({
+                removeRuleIds: rules.map((r) => r.id),
+                addRules: [],
+            });
+            console.log("🚫 Blocage désactivé : règles supprimées");
+            return;
+        }
 
-        // Toujours supprimer les anciennes règles dynamiques
+        // Sinon, on les met à jour
         await chrome.declarativeNetRequest.updateDynamicRules({
-            removeRuleIds: rules.map((r) => r.id),
-            addRules: rules ? rules : [],
+            removeRuleIds: rules.map((r) => r.id), // nettoyage avant ajout
+            addRules: rules,
         });
+        console.log("✅ Blocage activé : règles mises à jour");
     }
+
 
 });

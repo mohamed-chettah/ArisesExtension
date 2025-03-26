@@ -134,8 +134,10 @@ var background = function() {
         clearInterval(timerInterval);
       }
       if (message.action === "launch-blocker") {
-        console.log("Blocker launched");
         updateBlockingStatus();
+      }
+      if (message.action === "stop-blocker") {
+        updateBlockingStatus(true);
       }
     });
     function buildRulesFromSites(sites) {
@@ -156,16 +158,24 @@ var background = function() {
         };
       });
     }
-    async function updateBlockingStatus() {
+    async function updateBlockingStatus(remove = false) {
       const rawSites = await chrome.storage.local.get("listWebsite");
-      console.log(rawSites);
-      const sites = rawSites ? rawSites : [];
-      const rules = buildRulesFromSites(sites);
-      console.log(rules);
+      const sites = (rawSites == null ? void 0 : rawSites.listWebsite) || [];
+      const rules = buildRulesFromSites({ listWebsite: sites });
+      if (remove) {
+        await chrome.declarativeNetRequest.updateDynamicRules({
+          removeRuleIds: rules.map((r) => r.id),
+          addRules: []
+        });
+        console.log("🚫 Blocage désactivé : règles supprimées");
+        return;
+      }
       await chrome.declarativeNetRequest.updateDynamicRules({
         removeRuleIds: rules.map((r) => r.id),
-        addRules: rules ? rules : []
+        // nettoyage avant ajout
+        addRules: rules
       });
+      console.log("✅ Blocage activé : règles mises à jour");
     }
   });
   function initPlugins() {

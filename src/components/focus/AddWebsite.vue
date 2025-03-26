@@ -9,7 +9,7 @@ const isLoading = ref(false)
 const errorMessage = ref('')
 
 let token = await storage.getItem('local:accessToken')
-const emit = defineEmits(['fetchWebsite'])
+const emit = defineEmits(['fetchWebsite','arise'])
 
 const addWebsite = async () => {
   errorMessage.value = ''
@@ -38,6 +38,7 @@ const addWebsite = async () => {
     title.value = ''
     url.value = ''
     emit('fetchWebsite')
+    emit('arise')
   } catch (error) {
     console.error('Error adding website:', error)
     errorMessage.value = 'Erreur lors de l\'ajout du site.'
@@ -91,8 +92,16 @@ const addWebsite = async () => {
     </div>
 
     <Button type="submit" class="w-full bg-secondary/80 hover:bg-secondary flex justify-center items-center p-2 gap-2 text-white h-8 text-center rounded-lg" :disabled="isLoading">
-      <span v-if="isLoading"></span>
-      <p class="text-xs font-normal">{{ isLoading ? 'Loading...' : 'Add Website' }} </p>
+        <span v-if="isLoading">
+         <svg width="22" height="22" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="25" cy="25" r="20" stroke="white" stroke-width="4" fill="none"
+                    stroke-dasharray="100" stroke-dashoffset="0">
+              <animateTransform attributeType="XML" attributeName="transform" type="rotate"
+                                from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+        </span>
+        <p v-else class="text-xs font-normal">Add Website</p>
     </Button>
 
     <!-- Message d'erreur -->
