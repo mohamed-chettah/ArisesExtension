@@ -57,7 +57,7 @@ async function deleteItem(item : Website){
 
   <div v-else class="rounded-lg p-2 w-fit bg-black border-[0.5px] border-secondary shadow-2xl">
     <!-- Zone scrollable -->
-    <div class="h-[198px] overflow-y-auto pr-1 custom-scrollbar"> <!-- Ajoute ici la scroll zone -->
+    <div class="h-[217px] overflow-y-auto pr-1 custom-scrollbar"> <!-- Ajoute ici la scroll zone -->
       <table class="text-white table-fixed w-full border-collapse">
         <tbody>
         <tr

@@ -38,7 +38,6 @@ const addWebsite = async () => {
     title.value = ''
     url.value = ''
     emit('fetchWebsite')
-    emit('arise')
   } catch (error) {
     console.error('Error adding website:', error)
     errorMessage.value = 'Erreur lors de l\'ajout du site.'
