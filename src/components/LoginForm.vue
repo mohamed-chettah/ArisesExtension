@@ -207,8 +207,18 @@ async function storeData(data) {
             </div>
 
             <Button type="submit" class="w-full bg-secondary text-white" :disabled="isLoading">
-              <span v-if="isLoading"></span>
-              {{ isLoading ? 'Loading...' : 'Continue' }}
+              <span v-if="isLoading">
+                <svg width="30" height="30" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="25" cy="25" r="20" stroke="white" stroke-width="4" fill="none"
+                          stroke-dasharray="100" stroke-dashoffset="0">
+                    <animateTransform attributeType="XML" attributeName="transform" type="rotate"
+                                      from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/>
+                  </circle>
+                </svg>
+              </span>
+              <span v-else>
+                Continue
+              </span>
             </Button>
 
             <a

@@ -86,8 +86,8 @@ defineExpose({
         :isActiveBlocker="isActiveBlocker"
     />
 
-    <Button v-if="isActiveBlocker" @click="stop" class=" bg-secondary rounded-lg hover:bg-secondary/80 bank-gothic ">
-      <svg class="text-white" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path  fill="currentColor" d="M12 2C6.47 2 2 6.5 2 12s4.47 10 10 10s10-4.5 10-10S17.53 2 12 2zM9 15.59l-1.41-1.41L12 10.17l4.59 4.58L16 15l-4-4l-3.59 3.59z"/></svg>
+    <Button v-if="isActiveBlocker" @click="stop" class=" bg-secondary/60 rounded-lg hover:bg-secondary/80 bank-gothic ">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><!-- Icon from Material Design Icons by Pictogrammers - https://github.com/Templarian/MaterialDesign/blob/master/LICENSE --><path fill="currentColor" d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 2c4.41 0 8 3.59 8 8s-3.59 8-8 8s-8-3.59-8-8s3.59-8 8-8M9 9v6h6V9"/></svg>
       Stop
     </Button>
 
