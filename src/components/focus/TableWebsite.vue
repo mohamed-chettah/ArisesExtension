@@ -31,10 +31,9 @@ async function deleteItem(item : Website){
           'Authorization': `Bearer ${token}`
         }
       })
-
-      loading.value = false
       // emit
       emit('fetchWebsite')
+      loading.value = false
     } catch (error) {
       console.error('Error fetching websites:', error);
     }
@@ -45,7 +44,7 @@ async function deleteItem(item : Website){
 
 <template>
 
-  <div v-if="loading" class="w-full rounded-lg p-2 flex justify-center bg-black border-[0.5px] border-secondary shadow-2xl">
+  <div v-if="loading" class="w-full h-[215px] overflow-y-auto pr-1 rounded-lg p-2 flex justify-center items-center bg-black border-[0.5px] border-secondary shadow-2xl">
     <svg width="30" height="30" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
       <circle cx="25" cy="25" r="20" stroke="white" stroke-width="4" fill="none"
               stroke-dasharray="100" stroke-dashoffset="0">
@@ -57,7 +56,7 @@ async function deleteItem(item : Website){
 
   <div v-else class="rounded-lg p-2 w-fit bg-black border-[0.5px] border-secondary shadow-2xl">
     <!-- Zone scrollable -->
-    <div class="h-[217px] overflow-y-auto pr-1 custom-scrollbar"> <!-- Ajoute ici la scroll zone -->
+    <div class="h-[215px] overflow-y-auto pr-1 custom-scrollbar"> <!-- Ajoute ici la scroll zone -->
       <table class="text-white table-fixed w-full border-collapse">
         <tbody>
         <tr
