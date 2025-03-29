@@ -38,7 +38,7 @@ async function handleSignUp(e) {
   errors.value = {}
 
   try {
-    const response = await api.post('http://localhost:5005/api/register', {
+    const response = await api.post('/register', {
       name: name.value,
       email: email.value,
       password: password.value

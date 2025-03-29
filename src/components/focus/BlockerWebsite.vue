@@ -4,7 +4,7 @@ import {Button} from "@/components/ui/button";
 import TableWebsite from "@/components/focus/TableWebsite.vue";
 import AddWebsite from "@/components/focus/AddWebsite.vue";
 import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
-import axios from "axios";
+import api from '../../lib/api.ts'
 import {storage} from "wxt/storage";
 
 const listWebsite = ref([]);
@@ -18,14 +18,16 @@ onMounted(async () => {
     await fetchWebsites();
   }
   else {
+    isLoading.value = true;
     listWebsite.value = storeWebsite
+    isLoading.value = false;
   }
 });
 
 const fetchWebsites = async () => {
   try {
     isLoading.value = true;
-    const response = await axios.get('http://localhost:5005/api/user-website', {
+    const response = await api.get('/user-website', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -91,7 +93,7 @@ defineExpose({
         </PopoverContent>
       </Popover>
 
-      <Button @click="arise" class=" bg-secondary rounded-lg hover:bg-secondary/80 bank-gothic w-full text-[16px] ">
+      <Button @click="arise" class=" bg-secondary rounded-lg hover:bg-secondary/80 bank-gothic w-full ">
         <svg class="text-white" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path  fill="currentColor" d="m9 4l2.5 5.5L17 12l-5.5 2.5L9 20l-2.5-5.5L1 12l5.5-2.5zm0 4.83L8 11l-2.17 1L8 13l1 2.17L10 13l2.17-1L10 11zM19 9l-1.26-2.74L15 5l2.74-1.25L19 1l1.25 2.75L23 5l-2.75 1.26zm0 14l-1.26-2.74L15 19l2.74-1.25L19 15l1.25 2.75L23 19l-2.75 1.26z"/></svg>
         Arise
       </Button>

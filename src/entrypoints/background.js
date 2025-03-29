@@ -90,7 +90,6 @@ export default defineBackground(() => {
                 removeRuleIds: rules.map((r) => r.id),
                 addRules: [],
             });
-            console.log("🚫 Blocage désactivé : règles supprimées");
             return;
         }
 
@@ -99,7 +98,6 @@ export default defineBackground(() => {
             removeRuleIds: rules.map((r) => r.id), // nettoyage avant ajout
             addRules: rules,
         });
-        console.log("✅ Blocage activé : règles mises à jour");
     }
 
 

@@ -26,7 +26,7 @@ const addWebsite = async () => {
   try {
     isLoading.value = true
 
-    await api.post('http://localhost:5005/api/user-website', {
+    await api.post('/user-website', {
       title: title.value,
       website_url: url.value
     }, {

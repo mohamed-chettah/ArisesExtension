@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ref, watch } from 'vue'
-import api from '../lib/api.ts'
+import api, {startRefreshWatcher} from '../lib/api.ts'
 import { storage } from "wxt/storage"
 import { useRouter } from 'vue-router';
 import LoadingPage from "@/components/LoadingPage.vue";
@@ -15,7 +15,6 @@ const email = ref('')
 const password = ref('')
 const isLoading = ref(false)
 const isGoogleLoading = ref(false)
-const isXLoading = ref(false)
 const errors = ref({})
 const googleError = ref('')
 const xError = ref('')
@@ -36,10 +35,11 @@ onMounted(async () => {
 
   if(isOauth && token && !user){
     loading.value = true
-    const response = await api.get('http://localhost:5005/api/auth/status/' + token)
+    const response = await api.get('auth/status/' + token)
 
     if(response.status === 200){
       await storeData(response.data)
+      await startRefreshWatcher()
       await router.push('dashboard')
       loading.value = false
     }
@@ -84,11 +84,12 @@ async function handleSubmit(e) {
   errors.value = {}
   try {
     console.log("Sending login request...")
-    const response = await api.post('http://localhost:5005/api/login', {
+    const response = await api.post('/login', {
       email: email.value,
       password: password.value
     })
     await storeData(response.data)
+    await startRefreshWatcher()
     await router.push('/dashboard')
   } catch (error) {
     if (error.response?.data?.errors) {
@@ -110,7 +111,7 @@ async function handleGoogleLogin(e) {
   googleError.value = ''
   try {
     console.log("Sending Google login request...")
-    const response = await api.get('http://localhost:5005/api/auth/google')
+    const response = await api.get('/auth/google')
     if (response.data.url) {
       await chrome.tabs.create({url: response.data.url});
     }
@@ -121,26 +122,10 @@ async function handleGoogleLogin(e) {
   }
 }
 
-async function handleXLogin(e) {
-  e.preventDefault()
-  isXLoading.value = true
-  xError.value = ''
-  try {
-    console.log("Sending X login request...")
-    const response = await api.get('http://localhost:5005/api/auth/twitter')
-    if (response.data.url) {
-      chrome.tabs.create({ url: response.data.url });
-    }
-  } catch (error) {
-    xError.value = error.response?.data?.message || 'Failed to login with X'
-  } finally {
-    isXLoading.value = false
-  }
-}
-
 async function storeData(data) {
   await storage.setItem('local:accessToken', data.token)
   await storage.setItem('local:user', data.user)
+  await storage.setItem('local:expiration', data.expires_in)
 }
 </script>
 

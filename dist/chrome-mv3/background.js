@@ -167,7 +167,6 @@ var background = function() {
           removeRuleIds: rules.map((r) => r.id),
           addRules: []
         });
-        console.log("🚫 Blocage désactivé : règles supprimées");
         return;
       }
       await chrome.declarativeNetRequest.updateDynamicRules({
@@ -175,7 +174,6 @@ var background = function() {
         // nettoyage avant ajout
         addRules: rules
       });
-      console.log("✅ Blocage activé : règles mises à jour");
     }
   });
   function initPlugins() {

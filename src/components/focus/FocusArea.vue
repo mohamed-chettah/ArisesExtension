@@ -6,7 +6,7 @@ import BlockerWebsite from "@/components/focus/BlockerWebsite.vue";
 const blockerWebsiteRef = ref();
 
 function arise() {
-  blockerWebsiteRef.value?.arise();
+  // blockerWebsiteRef.value?.arise();
 }
 
 </script>

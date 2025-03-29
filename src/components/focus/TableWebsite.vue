@@ -26,7 +26,7 @@ async function deleteItem(item : Website){
   if(confirm('Are you sure you want to delete this item?')){
     try {
       loading.value = true
-      await api.delete('http://localhost:5005/api/user-website/' + item.id, {
+      await api.delete('/user-website/' + item.id, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -43,7 +43,6 @@ async function deleteItem(item : Website){
 </script>
 
 <template>
-
   <div v-if="loading" class="w-full h-[215px] overflow-y-auto pr-1 rounded-lg p-2 flex justify-center items-center bg-black border-[0.5px] border-secondary shadow-2xl">
     <svg width="30" height="30" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
       <circle cx="25" cy="25" r="20" stroke="white" stroke-width="4" fill="none"
@@ -54,11 +53,12 @@ async function deleteItem(item : Website){
     </svg>
   </div>
 
+
   <div v-else class="rounded-lg p-2 w-fit bg-black border-[0.5px] border-secondary shadow-2xl">
     <!-- Zone scrollable -->
     <div class="h-[215px] overflow-y-auto pr-1 custom-scrollbar"> <!-- Ajoute ici la scroll zone -->
       <table class="text-white table-fixed w-full border-collapse">
-        <tbody>
+        <tbody v-if="listWebsite.length > 0">
         <tr
             v-for="item in listWebsite"
             :key="item.website.id"
@@ -80,6 +80,15 @@ async function deleteItem(item : Website){
           </td>
         </tr>
         </tbody>
+
+        <tbody v-else>
+          <tr>
+            <td class="text-center align-middle">
+              <p class="text-white">No Websites </p>
+            </td>
+          </tr>
+        </tbody>
+
       </table>
     </div>
   </div>
