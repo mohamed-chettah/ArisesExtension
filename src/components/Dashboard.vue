@@ -4,7 +4,6 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import FocusArea from "@/components/focus/FocusArea.vue";
 import {logout} from '../lib/api.ts'
 
-
 const username = ref('')
 onMounted(async () => {
   const user = await storage.getItem('local:user')

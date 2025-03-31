@@ -3,7 +3,7 @@ import { storage } from 'wxt/storage';
 
 // Création d'une instance Axios avec l'URL de base
 const api = axios.create({
-    baseURL: 'http://localhost:5005/api', // Remplace par ton URL
+    baseURL: 'https://backend.arises.app/api', // Remplace par ton URL
     headers: { 'Content-Type': 'application/json' }
 });
 
@@ -38,6 +38,8 @@ api.interceptors.response.use(
                     logout();
                     return Promise.reject(err);
                 }
+            } else {
+                return Promise.reject(error);
             }
         }
 
