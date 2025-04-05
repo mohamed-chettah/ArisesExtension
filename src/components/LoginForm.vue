@@ -114,6 +114,7 @@ async function handleGoogleLogin(e) {
     const response = await api.get('/auth/google')
     if (response.data.url) {
       await chrome.tabs.create({url: response.data.url});
+
     }
   } catch (error) {
     googleError.value = error.response?.data?.message || 'Failed to login with Google'

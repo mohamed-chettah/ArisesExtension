@@ -5,17 +5,15 @@ export default defineConfig({
   extensionApi: 'chrome',
   modules: ['@wxt-dev/module-vue', '@wxt-dev/auto-icons'],
   manifest: {
-    name: 'Arises Extension',
+    name: 'Arises - Pomodoro timer, Distraction blocker and more',
+    version: '1.0.0',
     permissions: [
-      "identity",
-      "identity.email",
       "storage",
-      "tabs",
       "declarativeNetRequest",
       "declarativeNetRequestWithHostAccess"
     ],
     "web_accessible_resources": [{
-    "resources": ["oauth.html", "oauth.js", "blocked.html"],
+    "resources": ["oauth.html", "oauth.js", "blocked.html","break.html"],
     "matches": ["<all_urls>"]
     }],
     declarative_net_request : {
